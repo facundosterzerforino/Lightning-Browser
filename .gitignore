@@ -163,3 +163,6 @@ pip-log.txt
 .DS_Store
 build/
 build.log
+build-native/
+native.log
+native-syms.txt

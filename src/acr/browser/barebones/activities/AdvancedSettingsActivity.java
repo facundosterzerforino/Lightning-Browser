@@ -1,5 +1,6 @@
 package acr.browser.barebones.activities;
 
+import acr.browser.barebones.tls.ModernTls;
 import java.io.File;
 
 import acr.browser.barebones.R;
@@ -39,8 +40,8 @@ public class AdvancedSettingsActivity extends Activity {
 	static final String preferences = "settings";
 	static SharedPreferences settings;
 	static SharedPreferences.Editor edit;
-	static RelativeLayout r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15, r16;
-	static CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7, cb8, cb9, cb10, cb11, cb12;
+	static RelativeLayout r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15, r16, r17;
+	static CheckBox cb1, cb2, cb3, cb4, cb5, cb6, cb7, cb8, cb9, cb10, cb11, cb12, cb13;
 	static Context CONTEXT;
 	Handler messageHandler;
 
@@ -77,6 +78,7 @@ public class AdvancedSettingsActivity extends Activity {
 		r14 = (RelativeLayout) findViewById(R.id.r14);
 		r15 = (RelativeLayout) findViewById(R.id.r15);
 		r16 = (RelativeLayout) findViewById(R.id.r16);
+		r17 = (RelativeLayout) findViewById(R.id.r17);
 		
 
 		cb1 = (CheckBox) findViewById(R.id.cb1);
@@ -91,6 +93,7 @@ public class AdvancedSettingsActivity extends Activity {
 		cb10 = (CheckBox) findViewById(R.id.cb10);
 		cb11 = (CheckBox) findViewById(R.id.cb11);
 		cb12 = (CheckBox) findViewById(R.id.cb12);
+		cb13 = (CheckBox) findViewById(R.id.cb13);
 
 		cb1.setChecked(settings.getBoolean("passwords", true));
 		cb2.setChecked(settings.getBoolean("cache", false));
@@ -104,6 +107,7 @@ public class AdvancedSettingsActivity extends Activity {
 		cb10.setChecked(settings.getBoolean("restoreclosed", true));
 		cb11.setChecked(settings.getBoolean("hidestatus", false));
 		cb12.setChecked(settings.getBoolean("gestures", true));
+		cb13.setChecked(settings.getBoolean(ModernTls.PREF, true));
 
 		r1(r1);
 		r2(r2);
@@ -121,6 +125,12 @@ public class AdvancedSettingsActivity extends Activity {
 		r14(r14);
 		r15(r15);
 		r16(r16);
+		r17.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				cb13.setChecked(!cb13.isChecked());
+			}
+		});
 		cb1(cb1);
 		cb2(cb2);
 		cb3(cb3);
@@ -133,6 +143,15 @@ public class AdvancedSettingsActivity extends Activity {
 		cb10(cb10);
 		cb11(cb11);
 		cb12(cb12);
+		cb13.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				edit.putBoolean(ModernTls.PREF, isChecked);
+				edit.commit();
+				// xt550-libre: switch the WebView between mbedTLS and Android's own TLS
+				ModernTls.install(AdvancedSettingsActivity.this);
+			}
+		});
 		back();
 		
 		TextView importBookmarks = (TextView)findViewById(R.id.isImportAvailable);

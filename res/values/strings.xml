@@ -129,4 +129,5 @@
     <string name="download_sdcard_busy_dlg_title">USB storage unavailable</string>
     <string name="download_sdcard_busy_dlg_msg" >The storage is busy. To allow downloads, touch Turn Off USB Storage in the notification.</string>
 
+    <string name="modern_tls">Modern HTTPS (TLS 1.3)</string>
 </resources>

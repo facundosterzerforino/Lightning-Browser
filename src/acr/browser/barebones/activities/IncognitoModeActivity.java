@@ -1,5 +1,6 @@
 package acr.browser.barebones.activities;
 
+import acr.browser.barebones.tls.ModernTls;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -1729,6 +1730,8 @@ public class IncognitoModeActivity extends Activity implements OnTouchListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// xt550-libre: modern HTTPS before any WebView exists
+		ModernTls.install(this);
 		setContentView(R.layout.activity_main); // displays main xml layout
 		mContext = this;
 		ACTIVITY = this;

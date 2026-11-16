@@ -2,6 +2,7 @@ package acr.browser.barebones.webviewclasses;
 
 import acr.browser.barebones.activities.BrowserActivity;
 import acr.browser.barebones.utilities.Utils;
+import acr.browser.barebones.tls.ModernTls;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -65,6 +66,21 @@ public class CustomWebViewClient extends WebViewClient {
 					mailTo.getCc());
 			context.startActivity(i);
 			view.reload();
+			return true;
+		}
+		// xt550-libre: links meant for phone apps (meli://, intent://, fb://...)
+		// would show "Página web no disponible"; open the app if it exists,
+		// otherwise stay on the current page.
+		String scheme = Uri.parse(url).getScheme();
+		if (scheme != null && !scheme.equals("http") && !scheme.equals("https")
+				&& !scheme.equals("about") && !scheme.equals("javascript")
+				&& !scheme.equals("file") && !scheme.equals("data")
+				&& !scheme.equals("content")) {
+			try {
+				context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+			} catch (android.content.ActivityNotFoundException e) {
+				Log.i("Lightning", "no app for " + scheme + ": link ignored");
+			}
 			return true;
 		}
 		return super.shouldOverrideUrlLoading(view, url);
@@ -133,6 +149,7 @@ public class CustomWebViewClient extends WebViewClient {
 
 	@Override
 	public void onPageStarted(WebView view, String url, Bitmap favicon) {
+		ModernTls.ensure();
 		BrowserActivity.onPageStarted(view, url, favicon);
 		super.onPageStarted(view, url, favicon);
 	}
@@ -140,12 +157,22 @@ public class CustomWebViewClient extends WebViewClient {
 	@Override
 	public void onReceivedSslError(WebView view,
 			final SslErrorHandler handler, SslError error) {
+		// xt550-libre: the connection already passed mbedTLS (TLS 1.2/1.3,
+		// Mozilla roots, host name); Android 2.3 only complains because its
+		// 2012 root list doesn't know the site. Anything else asks the user,
+		// whatever the error type (upstream silently accepted non-"untrusted"
+		// errors such as a certificate for another site).
+		if (ModernTls.verifiedByUs(error)) {
+			handler.proceed();
+			return;
+		}
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle("Warning");
+		builder.setTitle("Advertencia");
 		builder.setMessage(
-				"The certificate of the site is not trusted. Proceed anyway?")
+				"No se pudo comprobar que este sitio sea el verdadero. "
+						+ "Continuar puede ser peligroso. \u00bfContinuar igual?")
 				.setCancelable(true)
-				.setPositiveButton("Yes",
+				.setPositiveButton("Continuar",
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog,
@@ -153,21 +180,21 @@ public class CustomWebViewClient extends WebViewClient {
 								handler.proceed();
 							}
 						})
-				.setNegativeButton("No",
+				.setNegativeButton("Cancelar",
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int id) {
 								handler.cancel();
 							}
-						});
-		AlertDialog alert = builder.create();
-		if (error.getPrimaryError() == SslError.SSL_UNTRUSTED) {
-			alert.show();
-		} else {
-			handler.proceed();
-		}
-
+						})
+				.setOnCancelListener(new DialogInterface.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						handler.cancel();
+					}
+				});
+		builder.create().show();
 	}
 
 	@Override

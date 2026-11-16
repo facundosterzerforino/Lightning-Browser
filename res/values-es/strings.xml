@@ -56,4 +56,5 @@
     <string name="clear_cookies">Limpiar cookies</string>
     <string name="gestures">Habilitar gestos de atrás y adelante</string>
 
+    <string name="modern_tls">HTTPS moderno (TLS 1.3)</string>
 </resources>

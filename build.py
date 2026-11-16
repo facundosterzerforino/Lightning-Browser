@@ -2,14 +2,15 @@
 """Offline build of Lightning Browser 3.0.5 (xt550-libre) for Android 2.3.
 
 Only explicit local inputs: JDK, Android build-tools (aapt, D8, zipalign,
-apksigner) and a platform android.jar used at compile time only.
+apksigner), a platform android.jar used at compile time only, and NDK r10e
+for the modern TLS library (jni/, third_party/mbedtls).
 """
-import argparse, hashlib, os, pathlib, shutil, subprocess, zipfile
+import argparse, hashlib, os, pathlib, shutil, subprocess, sys, zipfile
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    for a in ('--jdk', '--build-tools', '--android-jar', '--keystore', '--storepass-file'):
+    for a in ('--jdk', '--build-tools', '--android-jar', '--keystore', '--storepass-file', '--ndk'):
         p.add_argument(a, required=True)
     p.add_argument('--alias', default='music')
     a = p.parse_args()
@@ -26,7 +27,10 @@ def main():
     if out.exists(): shutil.rmtree(out)
     for d in ('gen', 'classes', 'dex'): (out / d).mkdir(parents=True)
     run = lambda *c: subprocess.run([str(x) for x in c], cwd=root, check=True)
-    common = ('-M', root / 'AndroidManifest.xml', '-S', root / 'res', '-I', a.android_jar,
+    sys.path.insert(0, str(root / 'jni'))
+    import build_native
+    native = build_native.build(a.ndk, out / 'native')
+    common = ('-M', root / 'AndroidManifest.xml', '-S', root / 'res', '-A', root / 'assets', '-I', a.android_jar,
               '--min-sdk-version', '8', '--target-sdk-version', '19')
     run(aapt, 'package', '-f', '-m', '-J', out / 'gen', *common)
     srcs = sorted((root / 'src').rglob('*.java')) + sorted((out / 'gen').rglob('*.java'))
@@ -40,6 +44,10 @@ def main():
         info = zipfile.ZipInfo('classes.dex', date_time=(1980, 1, 1, 0, 0, 0))
         info.compress_type = zipfile.ZIP_DEFLATED
         z.writestr(info, (out / 'dex/classes.dex').read_bytes())
+        for so in sorted(native.rglob('*.so')):
+            info = zipfile.ZipInfo('lib/' + so.relative_to(native).as_posix(), date_time=(1980, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            z.writestr(info, so.read_bytes())
     run(align, '-f', '4', unsigned, aligned)
     run(java, '-jar', signer, 'sign', '--ks', a.keystore, '--ks-key-alias', a.alias, '--ks-pass', 'file:' + a.storepass_file,
         '--min-sdk-version', '9', '--v1-signing-enabled', 'true', '--v2-signing-enabled', 'false', '--v3-signing-enabled', 'false',
