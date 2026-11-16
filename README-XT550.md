@@ -108,3 +108,7 @@ dispositivo ya no es compatible").
 - **Memory:** no measurable difference with the switch on or off (PSS with the
   same page: 39–42 MB both ways; the noise is about 2 MB).
 - The menu is in Spanish; Descargas lists, deletes, and shows the no-card message.
+
+## Wrong date warning (r2)
+
+Without a SIM the phone cannot set its clock by itself. If the date goes back (for example to 2012 after the battery is removed), every certificate looks invalid and no secure page opens. On start, if the date is before the day the root list was made (2026-11-16), the browser now says so in plain Spanish ("La fecha del teléfono está mal") and offers a "Corregir fecha" button that opens Ajustes → Fecha y hora.

@@ -1764,6 +1764,7 @@ public class BrowserActivity extends Activity implements OnTouchListener {
 		// xt550-libre: modern HTTPS before any WebView exists
 		ModernTls.install(this);
 		setContentView(R.layout.activity_main); // displays main xml layout
+		ModernTls.checkClock(this);
 		mContext = this;
 		ACTIVITY = this;
 		settings = getSharedPreferences("settings", 0);

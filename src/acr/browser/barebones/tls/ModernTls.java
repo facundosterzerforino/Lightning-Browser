@@ -9,7 +9,11 @@ import java.util.LinkedList;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.http.SslCertificate;
 import android.net.http.SslError;
 import android.util.Log;
@@ -45,7 +49,41 @@ public final class ModernTls {
 	private static final java.util.HashSet<String> sResumable = new java.util.HashSet<String>();
 	private static final long FIRST_WAIT_MS = 4000;
 
+	/** The root list was generated on 2026-11-16: a clock before that is surely wrong. */
+	private static final long ROOTS_DATE_MS = 1794787200000L; // 2026-11-16 00:00 UTC
+	private static boolean sClockWarned;
+
 	private ModernTls() {
+	}
+
+	/**
+	 * If the phone's date is clearly wrong (e.g. reset after the battery was
+	 * removed), every certificate looks expired or not yet valid and no secure
+	 * page opens. Tell the user once, in plain words, with a shortcut to the
+	 * date settings.
+	 */
+	public static void checkClock(final Activity activity) {
+		if (sClockWarned || !sReady || System.currentTimeMillis() >= ROOTS_DATE_MS) {
+			return;
+		}
+		sClockWarned = true;
+		java.text.DateFormat f = new java.text.SimpleDateFormat("d/M/yyyy");
+		new AlertDialog.Builder(activity)
+				.setTitle("La fecha del tel\u00e9fono est\u00e1 mal")
+				.setMessage("El tel\u00e9fono dice que hoy es "
+						+ f.format(new java.util.Date()) + ". Con esa fecha las p\u00e1ginas "
+						+ "seguras (https) no abren. Correg\u00ed la fecha y la hora.")
+				.setPositiveButton("Corregir fecha", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface d, int w) {
+						try {
+							activity.startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
+						} catch (Exception e) {
+							Log.w(TAG, "no date settings screen", e);
+						}
+					}
+				})
+				.setNegativeButton("Ahora no", null)
+				.show();
 	}
 
 	/** Loads mbedTLS + roots and swaps the WebView socket factory. Safe to call often. */
