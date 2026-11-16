@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- xt550-libre: Downloads screen -->
+<resources>
+    <string name="xt550_downloads">Downloads</string>
+    <string name="xt550_no_downloads">No downloads yet.</string>
+    <string name="xt550_download_done">Download finished</string>
+    <string name="xt550_status_done">Done · %1$s</string>
+    <string name="xt550_status_failed">Failed</string>
+    <string name="xt550_status_paused">Paused (waiting for Wi-Fi)</string>
+    <string name="xt550_status_pending">Waiting…</string>
+    <string name="xt550_status_running">Downloading… %1$d%%</string>
+    <string name="xt550_status_running_unknown">Downloading…</string>
+    <string name="xt550_no_app">No app on this phone can open this file.</string>
+    <string name="xt550_delete_question">Delete this file?</string>
+    <string name="xt550_delete">Delete</string>
+    <string name="xt550_no_card">To download files, insert a memory card (microSD) in the phone.</string>
+</resources>

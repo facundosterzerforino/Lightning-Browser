@@ -140,6 +140,12 @@ public class Utils {
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	public static void downloadFile(final Context context, final String url,
 			final String contentDisposition, final String mimetype) {
+		// xt550-libre: Android 2.3 downloads only to the memory card; say so plainly
+		if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+			Toast.makeText(context, acr.browser.barebones.R.string.xt550_no_card,
+					Toast.LENGTH_LONG).show();
+			return;
+		}
 		try {
 			DownloadManager download = (DownloadManager) context
 					.getSystemService(Context.DOWNLOAD_SERVICE);

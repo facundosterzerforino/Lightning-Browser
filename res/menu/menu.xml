@@ -4,6 +4,7 @@
     <item android:id="@+id/bookmark" android:title="@string/action_add_bookmark" android:titleCondensed="@string/action_add_bookmark" android:orderInCategory="2"></item>
     <item android:id="@+id/allBookmarks" android:titleCondensed="@string/action_bookmarks" android:title="@string/action_bookmarks" android:orderInCategory="3"></item>
     <item android:id="@+id/share" android:title="@string/action_share" android:titleCondensed="@string/action_share" android:orderInCategory="4"></item>
+    <item android:id="@+id/downloads" android:title="@string/xt550_downloads" android:titleCondensed="@string/xt550_downloads" android:orderInCategory="5"></item>
     <item android:id="@+id/settings" android:title="@string/action_settings" android:titleCondensed="@string/action_settings" android:orderInCategory="6"></item>
     <item android:id="@+id/incognito" android:title="@string/action_incognito" android:orderInCategory="5" android:titleCondensed="@string/action_incognito"></item>
     

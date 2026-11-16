@@ -1780,10 +1780,8 @@ public class BrowserActivity extends Activity implements OnTouchListener {
 		try {
 			LocationManager locationManager = (LocationManager) mContext
 					.getSystemService(Context.LOCATION_SERVICE);
-			if (locationManager.getAllProviders().contains(
-					LocationManager.GPS_PROVIDER)) {
-				DEVICE_HAS_GPS = true;
-			}
+			// xt550-libre: no location permission; geolocation stays off
+			DEVICE_HAS_GPS = false;
 		} catch (Exception ignored) {
 			DEVICE_HAS_GPS = false;
 		}
@@ -1962,6 +1960,9 @@ public class BrowserActivity extends Activity implements OnTouchListener {
 			return true;
 		case R.id.settings:
 			newSettings();
+			return true;
+		case R.id.downloads:
+			startActivity(new Intent(mContext, DownloadsActivity.class));
 			return true;
 		case R.id.allBookmarks:
 			if (urlToLoad[currentId][1] == null) {
@@ -2188,6 +2189,9 @@ public class BrowserActivity extends Activity implements OnTouchListener {
 								return true;
 							case R.id.settings:
 								newSettings();
+								return true;
+							case R.id.downloads:
+								startActivity(new Intent(mContext, DownloadsActivity.class));
 								return true;
 							case R.id.allBookmarks:
 								if (urlToLoad[currentId][1] == null) {

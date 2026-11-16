@@ -16,9 +16,9 @@ public class BookmarkPageVariables {
 			+ "</style><body bgcolor = #f2f2f2>";
 	public static final String Part1 = "<div class=\"clickable\">"
 			+ "<div class=\"shadow\">" + "<p class=\"font\">" + "<a href=\"";
-	public static final String Part2 = "\"></a>"+
-					 "<img height=\"15px\" width=\"15px\" src='https://www.google.com/s2/favicons?domain_url=";
-	public static final String Part3 = "'/>";
+	// xt550-libre: no favicons from www.google.com/s2/favicons (it leaked every bookmark to Google)
+	public static final String Part2 = "\"></a><span title='";
+	public static final String Part3 = "'></span>";
 	public static final String Part4 = "</p></div></div>";
 	public static final String End = "</body></html>";
 }
